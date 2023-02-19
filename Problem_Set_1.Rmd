@@ -1,0 +1,228 @@
+---
+title: "Problem Set 1"
+author: "Luis Rivas"
+subtitle: MGSC 310 Problem Set 1
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+
+
+library(knitr)
+
+# As long as you are working in a Rstudio Project file, you shouldn't need to 'hard code' directories like this 
+# change to your own working directory
+#knitr::opts_knit$set(root.dir = 'C:/Users/doosti/Desktop/MGSC_310')
+knitr::opts_knit$set(root.dir = '/Users/luisrivas/Documents/CPSC_Courses/MGSC_310/')
+
+# set seed to your own favorite number
+set.seed(310)
+options(width=70)
+# if you want to prevent scientific format for numbers use this:
+options(scipen=99)
+
+# general rchunk code options
+opts_chunk$set(tidy.opts=list(width.wrap=50),tidy=FALSE, size = "vsmall")
+opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               cache = TRUE,
+               autodep = TRUE,
+               cache.comments = FALSE,
+               collapse = TRUE,
+               fig.width = 5,  
+               fig.height = 4,
+               fig.align='center')
+
+```
+
+```{r setup_2}
+
+# load all your libraries here
+library('tidyverse')
+# note, do not run install.packages() inside a code chunk. install them in the console outside of a code chunk. 
+
+```
+
+
+## Question 1
+
+1a) Checking that the working directory is set correctly. 
+
+```{r}
+
+# code for part a
+getwd() 
+
+```
+
+
+1b) Reading IMDB_movies.csv dataset into movies. 
+
+```{r}
+
+# code for part b
+movies <- read.csv("datasets/IMDB_movies.csv")
+
+```
+
+
+1c) This dataset has 3889 rows and 25 columns. 
+
+```{r}
+
+# code for 1c
+dim(movies)
+
+```
+
+
+1d) These are the names of the variables in the movies dataset. 
+
+```{r}
+
+# code for 1d
+names(movies)
+
+```
+
+
+1e) Here we can see the data type of each variable. The variables that are characters are: movie_title, director_name, country, language, genres, content_rating, color, plot_keywords, actor_1_name, actor_2_name. You can tell because they have "chr" after the variable name. 
+
+```{r}
+
+# code for 1e
+movies %>% glimpse()
+
+```
+
+
+1f) Here are the first 5 rows of the dataset. 
+
+```{r}
+
+# code for 1f
+movies %>% slice(1:5)
+
+```
+
+
+1g) Here are the top 10 grossing movies in the dataset in descending order. Director James Cameron is king of the box office. 
+
+```{r}
+
+# code for 1g
+movies %>% arrange(-gross) %>% slice(1:10)
+
+```
+
+
+1h) Creating a smaller dataset called movies_sub which is simply the movies dataset but without the variable movies_sub. This new dataset still has the original 3889 rows but only has 24 columns, as opposed to movies which has 25 columns. 
+
+```{r}
+
+# code for 1h
+movies_sub <- movies %>% select(-facenumber_in_poster)
+dim(movies_sub)
+
+```
+
+
+1i) There are 1329 movies rated PG-13 in this dataset. The average gross for PG-13 movies in this dataset is $68,270,240. 
+
+```{r}
+
+# code for 1i
+pg13 <- movies %>% filter(content_rating == "PG-13") 
+nrow(pg13) 
+mean(pg13$gross)
+
+```
+
+
+
+## Question 2
+
+2a) Scatter plot of IMDB score on the x-axis and gross on the y-axis. 
+
+
+```{r}
+
+# code for 2a
+library(ggplot2)
+ggplot(movies, aes(x = imdb_score, y = gross)) + geom_point()
+
+```
+
+
+2b) Same scatter plot but with reduced transparency of each point. 
+
+
+```{r}
+
+# code for 2b
+ggplot(movies, aes(x = imdb_score, y = gross)) + geom_point(alpha = 1/10)
+
+```
+
+
+2c) Same scatter plot but with y-axis in millions of dollars. 
+
+
+```{r}
+
+# code for 2c
+movies <- movies %>% mutate(grossM = gross/1000000)
+ggplot(movies, aes(x = imdb_score, y = grossM)) + geom_point(alpha = 1/10)
+
+```
+
+
+2d) Same scatter plot but with a smoothing line. The relationship between movie gross and IMDB score is positive. In general, when one goes up, the other also goes up. 
+
+
+```{r}
+
+# code for 2d
+ggplot(movies, aes(x = imdb_score, y = grossM)) + geom_point(alpha = 1/10) + geom_smooth()
+
+```
+
+
+2e) Scatter plot showing movies gross against IMDB score for James Cameron films, where the points are the movie titles. 
+
+
+```{r}
+
+# code for 2e
+ggplot(movies %>% filter(director_name == "James Cameron"), aes(x = imdb_score, y = grossM)) + geom_text(aes(label = movie_title), color = "blue") 
+
+```
+
+
+2f) Same scatter plot but with more reasonable ranges for the axes. 
+
+
+```{r}
+
+# code for 2f
+ggplot(movies %>% filter(director_name == "James Cameron"), aes(x = imdb_score, y = grossM)) + geom_text(aes(label = movie_title), color = "blue") + xlim(7,9) + ylim(0,800)
+
+```
+
+
+2g) Same scatter plot but with better axes titles. 
+
+
+```{r}
+
+# code for 2g
+ggplot(movies %>% filter(director_name == "James Cameron"), aes(x = imdb_score, y = grossM)) + 
+  geom_text(aes(label = movie_title), color = "blue") + xlim(7,9) + ylim(0,800) + 
+  xlab("Movie IMDB Score") + ylab("Movie Gross in Millions")
+
+```
+
+
